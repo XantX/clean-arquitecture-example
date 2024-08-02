@@ -6,13 +6,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import static org.mockito.Mockito.when;
 
 
+@ExtendWith(MockitoExtension.class)
 class UserRepositoryTest {
 
     @Mock
@@ -27,11 +29,6 @@ class UserRepositoryTest {
 
     @InjectMocks
     private UserRepository userRepository;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     public void getUsers() {
@@ -72,7 +69,6 @@ class UserRepositoryTest {
         //Act
         List<User> users = userRepository.getUsers(limit);
         //Assert
-        Assertions.assertThat(users).isNotNull();
         Assertions.assertThat(users).isNotNull();
         Assertions.assertThat(users).hasSize(2);
         Assertions.assertThat(users.get(0).getName()).isEqualTo("User1");
