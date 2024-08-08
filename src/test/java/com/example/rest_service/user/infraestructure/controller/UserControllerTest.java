@@ -6,9 +6,6 @@ import com.example.rest_service.user.infraestructure.controller.dtos.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,11 +23,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @WebMvcTest(controllers = UserController.class)
 @ExtendWith(MockitoExtension.class)
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -58,14 +58,18 @@ class UserControllerTest {
 
     @Test
     public void getUsers() throws Exception {
-        when(userUseCase.getUser(2)).thenReturn(users);
+        when(userUseCase.getUser(users.size())).thenReturn(users);
 
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/users")
-                .queryParam("limit", String.valueOf(2))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userDtos.toString()));
+                .queryParam("limit", String.valueOf(users.size()))
+                .contentType(MediaType.APPLICATION_JSON));
 
-        response.andExpect(MockMvcResultMatchers.status().isOk());
-        response.andExpect(MockMvcResultMatchers.jsonPath("name").value("Pedro"));
+        response.andExpect(status().isOk());
+        response.andExpect(MockMvcResultMatchers.jsonPath("$.data", hasSize(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").isString())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name").value("Pedro"));
     }
 }
